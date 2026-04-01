@@ -1,35 +1,21 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 
-# Configuração da Página
-st.set_page_config(page_title="Gerador de Grana com IA", page_icon="💰")
-st.title("🤖 Assistente de Conteúdo Lucrativo")
-st.write("Crie textos de alta conversão e venda para clientes!")
+st.title("💰 Meu Gerador de Grana")
 
-# Aqui você insere sua chave da API da OpenAI
-# Pegue a sua em: https://openai.com
-api_key = st.sidebar.text_input("Insira sua OpenAI API Key", type="password")
+# Pede a chave para funcionar
+chave = st.text_input("Cole sua Chave API aqui:", type="password")
 
-if api_key:
-    client = OpenAI(api_key=api_key)
+if chave:
+    client = openai.OpenAI(api_key=chave)
+    tema = st.text_input("Sobre o que quer escrever?")
     
-    servico = st.selectbox("O que você quer vender hoje?", 
-                          ["Legendas para Instagram", "Roteiro de TikTok", "Descrição de Produto (E-commerce)"])
-    
-    detalhes = st.text_area("Sobre o que é o conteúdo?")
-    
-    if st.button("Gerar Conteúdo para Venda"):
-        with st.spinner('A IA está trabalhando para você...'):
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": f"Você é um expert em marketing. Crie um {servico}."},
-                    {"role": "user", "content": detalhes}
-                ]
-            )
-            resultado = response.choices[0].message.content
-            st.success("Conteúdo Pronto!")
-            st.write(resultado)
-            st.download_button("Baixar Texto", resultado)
+    if st.button("Gerar Texto"):
+        # Comando que pede para a IA escrever
+        chamada = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": f"Crie um texto de venda sobre: {tema}"}]
+        )
+        st.write(chamada.choices[0].message.content)
 else:
-    st.warning("Coloque sua API Key na barra lateral para começar a faturar.")
+    st.write("Coloque a chave na caixa acima para o site ligar!")
